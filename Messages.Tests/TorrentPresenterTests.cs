@@ -71,25 +71,12 @@ namespace Messages.Tests
         }
         
         [TestCase]
-        public void ShoudNotSetIsSeenWhenSeenOnIsEmpty()
-        {
-            // arrange
-            var topic = CreateTopic();
-            var torrent = CreateTorrent();
-            torrent.SeenOn = null;
-
-            // act 
-            var sut = new TorrentPresenter(topic, torrent);
-            Assert.That(sut.IsSeen, Is.EqualTo(false));
-        }
-
-        [TestCase]
         public void ShoudSetIsSeen()
         {
             // arrange
             var topic = CreateTopic();
             var torrent = CreateTorrent();
-            torrent.SeenOn = DateTime.Now;
+            torrent.IsSeen = true;
 
             // act 
             var sut = new TorrentPresenter(topic, torrent);

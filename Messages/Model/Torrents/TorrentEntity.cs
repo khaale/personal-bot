@@ -21,7 +21,8 @@ namespace Messages.Model.Torrents
             RowKey = infoHash;
         }
 
-        public DateTime? SeenOn { get; set; }
+        public bool IsSeen { get; set; }
+        public bool IsDownloaded { get; set; }
 
         public TorrentKey GetKey()
         {

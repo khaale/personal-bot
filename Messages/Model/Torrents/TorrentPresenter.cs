@@ -16,6 +16,7 @@ namespace Messages.Model.Torrents
         public string TopicUrl { get; set; }
         public string DownloadUrl { get; set; }
         public bool IsSeen { get; set; }
+        public bool IsDownloaded { get; set; }
 
         public TorrentKey Key { get; set; }
 
@@ -62,7 +63,8 @@ namespace Messages.Model.Torrents
             TopicUrl = $"https://rutracker.org/forum/viewtopic.php?t={topic.Id}";
             DownloadUrl = $"https://rutracker.org/forum/dl.php?t={topic.Id}";
             Key = new TorrentKey(topic.Id, topic.InfoHash);
-            IsSeen = entity?.SeenOn != null;
+            IsSeen = entity?.IsSeen ?? false;
+            IsDownloaded = entity?.IsDownloaded ?? false;
         }
 
         private static string GetIntervalAsString(DateTime time)

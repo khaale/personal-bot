@@ -48,36 +48,72 @@ namespace Messages.Responders
         private static void FillReply(Activity reply, IReadOnlyCollection<(Topic, TorrentEntity)> topics)
         {
             topics
-                .OrderBy(x => x.Item2?.SeenOn != null)
+                .OrderBy(x => x.Item2?.IsSeen)
+                .ThenBy(x => x.Item2?.IsDownloaded)
                 .ThenByDescending(t => t.Item1.RegTime)
                 .Select(t => new TorrentPresenter(t.Item1, t.Item2))
                 .ToList()
                 .ForEach(t =>
                 {
-                    
-                    var card = new HeroCard
-                    {
-                        Title = t.Title,
-                        Subtitle = (t.IsSeen ? "[Seen] " : "") + t.Updated,
-                        Text = t.Series
-                    };
-                    card.Buttons = new List<CardAction>
-                    {
-                        new CardAction(
-                            title: "Go to topic", 
-                            value: t.TopicUrl, 
-                            type:"openUrl"),
-                        new CardAction(
-                            title: "Download torrent", 
-                            value: t.DownloadUrl, 
-                            type:"openUrl"),
-                        new CardAction(
-                            title: MessagesConsts.MarkAsSeenAction, 
-                            value: $"{MessagesConsts.MarkAsSeenAction} {t.Key}", 
-                            type:"imBack")
-                    };
-                    reply.Attachments.Add(card.ToAttachment());
+                    FillReply(reply, t);
                 });
+        }
+
+        private static void FillReply(Activity reply, TorrentPresenter t)
+        {
+            var card = new HeroCard
+            {
+                Title = t.Title,
+                Subtitle = 
+                    (t.IsDownloaded ? "\u25bc " : "")
+                    + (t.IsSeen ? "\u2714 " : "")
+                    + t.Updated,
+            };
+
+            card.Buttons = new List<CardAction>
+                    {
+                        new CardAction(
+                            title: "Go to topic",
+                            value: t.TopicUrl,
+                            type:"openUrl")
+                    };
+
+            if (t.IsSeen)
+            {
+                card.Buttons.Add(
+                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.ClearState));
+            }
+            else if (t.IsDownloaded)
+            {
+                card.Buttons.Add(
+                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.MarkAsSeenAction));
+            }
+            else
+            {
+                card.Buttons.Add(
+                    CreateDownloadButton(t.DownloadUrl));
+                card.Buttons.Add(
+                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.MarkAsDownloadedAction));
+            }
+
+
+            reply.Attachments.Add(card.ToAttachment());
+        }
+
+        private static CardAction CreateTorrentStateChangeButton(TorrentKey key, string command)
+        {
+            return new CardAction(
+                            title: command,
+                            value: $"{command} {key}",
+                            type: "imBack");
+        }
+
+        private static CardAction CreateDownloadButton(string downloadUrl)
+        {
+            return new CardAction(
+                            title: "Download torrent",
+                            value: downloadUrl,
+                            type: "openUrl");
         }
     }
 }

@@ -29,6 +29,13 @@ namespace Messages.Services.Torrents
 
             await Task.WhenAll(opTasks.ToArray());
         }
+        public async Task SaveTorrentAsync<T>(T torrent) where T : ITableEntity
+        {
+            CloudTable table = await GetTableAsync();
+
+            var op = TableOperation.InsertOrMerge(torrent);
+            await table.ExecuteAsync(op);
+        }
 
         public async Task<IReadOnlyCollection<TorrentEntity>> GetTorrentsAsync(IEnumerable<TorrentKey> keys)
         {

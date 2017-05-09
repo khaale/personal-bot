@@ -125,7 +125,7 @@
   <ItemGroup>
     <Compile Include="Model\Torrents\TorrentKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Responders\MarkAsSeenResponder.cs" />
+    <Compile Include="Responders\TorrentMarkResponders.cs" />
     <Compile Include="Responders\MessagesConsts.cs" />
     <Compile Include="Responders\TorrentListResponder.cs" />
     <Compile Include="Services\Torrents\RutrackerService.cs" />

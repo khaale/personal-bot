@@ -78,8 +78,14 @@ namespace Messages
                 var reply = request.CreateReply();
                 switch (request.Text)
                 {
-                    case string txt when MarkAsSeenResponder.Match(txt):
-                        await MarkAsSeenResponder.ProcessAsync(client, reply, txt);
+                    case string txt when new MarkAsSeenResponder().Match(txt):
+                        await new MarkAsSeenResponder().ProcessAsync(client, reply, txt);
+                        break;
+                    case string txt when new MarkAsDownloadedResponder().Match(txt):
+                        await new MarkAsDownloadedResponder().ProcessAsync(client, reply, txt);
+                        break;
+                    case string txt when new ClearTorrentStateResponder().Match(txt):
+                        await new ClearTorrentStateResponder().ProcessAsync(client, reply, txt);
                         break;
                     default:
                         await TorrentListResponder.ProcessAsync(client, reply, TopicIds);
