@@ -1,17 +1,16 @@
 using System;
-using System.Net;
-using System.Threading;
-using Newtonsoft.Json;
-using Microsoft.Bot.Builder.Azure;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using System.Net.Http;
-using Messages.Responders;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Azure;
+using Microsoft.Bot.Builder.Azure;
+using Microsoft.Bot.Connector;
+using Newtonsoft.Json;
+using PersonalBot.Shared.Domain.Torrents.Responders;
 
-namespace Messages
+namespace PersonalBot.Functions.Messages
 {
 
     public class Func

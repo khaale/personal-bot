@@ -1,11 +1,10 @@
-﻿using Microsoft.Bot.Connector;
-using System;
-using System.Threading.Tasks;
-using Messages.Model.Torrents;
-using Messages.Services.Torrents;
+﻿using System.Threading.Tasks;
+using Microsoft.Bot.Connector;
 using Microsoft.WindowsAzure.Storage.Table;
+using PersonalBot.Shared.Domain.Torrents.Models;
+using PersonalBot.Shared.Domain.Torrents.Services;
 
-namespace Messages.Responders
+namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class MarkAsSeenResponder : TorrentMarkResponder
     {

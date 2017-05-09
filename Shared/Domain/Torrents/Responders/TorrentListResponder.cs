@@ -1,13 +1,11 @@
-﻿using Microsoft.Bot.Connector;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Messages.Model.Torrents;
-using Messages.Services.Torrents;
+using Microsoft.Bot.Connector;
+using PersonalBot.Shared.Domain.Torrents.Models;
+using PersonalBot.Shared.Domain.Torrents.Services;
 
-namespace Messages.Responders
+namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class TorrentListResponder
     {

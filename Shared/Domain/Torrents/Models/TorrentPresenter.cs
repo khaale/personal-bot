@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Messages.Model.Torrents
+namespace PersonalBot.Shared.Domain.Torrents.Models
 {
     public class TorrentPresenter
     {

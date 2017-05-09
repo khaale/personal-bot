@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.WindowsAzure.Storage.Table; 
+﻿using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Messages.Model.Torrents
+namespace PersonalBot.Shared.Domain.Torrents.Models
 {
     public class TorrentEntity : TableEntity
     {

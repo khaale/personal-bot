@@ -1,14 +1,14 @@
-﻿using Messages.Model.Torrents;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PersonalBot.Shared.Domain.Torrents.Models;
 
-namespace Messages.Services.Torrents
+namespace PersonalBot.Shared.Domain.Torrents.Services
 {
     public class RutrackerService
     {

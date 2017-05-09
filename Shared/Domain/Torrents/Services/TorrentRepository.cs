@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Messages.Model.Torrents;
+using PersonalBot.Shared.Domain.Torrents.Models;
 
-namespace Messages.Services.Torrents
+namespace PersonalBot.Shared.Domain.Torrents.Services
 {
     public class TorrentRepository
     {

@@ -1,9 +1,9 @@
-﻿using Messages.Services.Torrents;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Linq;
+using NUnit.Framework;
+using PersonalBot.Shared.Domain.Torrents.Services;
 
-namespace Messages.Tests
+namespace PersonalBot.Shared.Tests
 {
     [TestFixture]
     public class RutrackerServiceTests

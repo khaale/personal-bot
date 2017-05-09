@@ -1,9 +1,8 @@
-﻿using Messages.Model.Torrents;
+﻿using System;
 using NUnit.Framework;
-using System;
-using System.Linq;
+using PersonalBot.Shared.Domain.Torrents.Models;
 
-namespace Messages.Tests
+namespace PersonalBot.Shared.Tests
 {
     [TestFixture]
     public class TorrentPresenterTests

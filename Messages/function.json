@@ -1,6 +1,6 @@
 ﻿{
-  "scriptFile": "bin\\Debug\\Messages.dll",
-  "entryPoint": "Messages.Func.Run",
+  "scriptFile": "bin\\Debug\\PersonalBot.Functions.Messages.dll",
+  "entryPoint": "PersonalBot.Functions.Messages.Func.Run",
   "bindings": [
     {
       "type": "httpTrigger",

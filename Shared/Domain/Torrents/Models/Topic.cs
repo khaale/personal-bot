@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Messages.Model.Torrents
+namespace PersonalBot.Shared.Domain.Torrents.Models
 {
     public class Topic
     {
