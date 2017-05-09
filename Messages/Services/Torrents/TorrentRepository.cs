@@ -43,7 +43,7 @@ namespace Messages.Services.Torrents
 
             var torrents =
                 from r in results
-                where r != null
+                where r.Result != null
                 select (TorrentEntity)r.Result;
 
             return torrents.ToList();

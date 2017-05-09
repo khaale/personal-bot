@@ -90,6 +90,7 @@ namespace Messages
             {
                 var reply = request.CreateReply();
                 reply.Text = ex.ToString();
+                reply.TextFormat = "plain";
                 await client.Conversations.ReplyToActivityAsync(reply);
             }
         }
