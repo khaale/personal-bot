@@ -1,0 +1,18 @@
+﻿{
+  "scriptFile": "bin\\Debug\\PersonalBot.Functions.CheckTorrents.dll",
+  "entryPoint": "PersonalBot.Functions.CheckTorrents.Func.Run",
+  "bindings": [
+    {
+      "type": "timerTrigger",
+      "name": "timerInfo",
+      "schedule": "0 */30 * * * *",
+      "direction": "in"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    }
+  ],
+  "disabled": false
+}

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure;
 using Microsoft.Bot.Connector;
 using PersonalBot.Shared.Domain.Torrents.Models;
 using PersonalBot.Shared.Domain.Torrents.Services;
@@ -9,27 +11,55 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class TorrentListResponder
     {
-        public static async Task ProcessAsync(ConnectorClient client, Activity reply, string[] topicIds)
+        public static string[] TopicIds
+        {
+            get
+            {
+                var topicIdsString = CloudConfigurationManager.GetSetting("TopicIds");
+
+                if (topicIdsString == null)
+                {
+                    throw new ApplicationException("TopicIds setting must be provided");
+                }
+
+                return topicIdsString.Split(',');
+            }
+        }
+
+        public static async Task ProcessAsync(ConnectorClient client, Activity reply, bool sendWhenNew = false)
         {
             var repository = new TorrentRepository();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            reply.Attachments = reply.Attachments ?? new List<Attachment>();
 
             // Get torrent topics from Rutracker
             var rutrackerService = new RutrackerService();
-            var topics = await rutrackerService.GetTopicsAsync(topicIds);
+            var topics = await rutrackerService.GetTopicsAsync(TopicIds);
 
             // Get saved torrents
             var keys = topics.Select(t => new TorrentKey(t.Id, t.InfoHash));
             var existingTorrents = await repository.GetTorrentsAsync(keys);
 
             var data = GetTopicsAndExistingData(topics, existingTorrents).ToList();
+            
+            var newTorrents = data.Where(x => x.Item2 == null).Select(x => new TorrentEntity(x.Item1)).ToList();
 
-            // Fill and send reply message
-            FillReply(reply, data);
-            await client.Conversations.ReplyToActivityAsync(reply);
+            if (!sendWhenNew || newTorrents.Any())
+            {
+                // Fill and send reply message
+                FillReply(reply, data);
+
+                if (reply.ReplyToId != null)
+                {
+                    await client.Conversations.ReplyToActivityAsync(reply);
+                }
+                else
+                {
+                    await client.Conversations.SendToConversationAsync(reply);
+                }
+            }
 
             // Save new torrents to the storage
-            var newTorrents = data.Where(x => x.Item2 == null).Select(x => new TorrentEntity(x.Item1)).ToList();
             await repository.SaveTorrentsAsync(newTorrents);
         }
 
@@ -79,30 +109,29 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             if (t.IsSeen)
             {
                 card.Buttons.Add(
-                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.ClearState));
+                    CreateTorrentStateChangeButton(t.Key, Actions.TorrentResetState));
             }
             else if (t.IsDownloaded)
             {
                 card.Buttons.Add(
-                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.MarkAsSeenAction));
+                    CreateTorrentStateChangeButton(t.Key, Actions.TorrrentSeen));
             }
             else
             {
                 card.Buttons.Add(
                     CreateDownloadButton(t.DownloadUrl));
                 card.Buttons.Add(
-                    CreateTorrentStateChangeButton(t.Key, MessagesConsts.MarkAsDownloadedAction));
+                    CreateTorrentStateChangeButton(t.Key, Actions.TorrrentDownloaded));
             }
-
-
+            
             reply.Attachments.Add(card.ToAttachment());
         }
 
-        private static CardAction CreateTorrentStateChangeButton(TorrentKey key, string command)
+        private static CardAction CreateTorrentStateChangeButton(TorrentKey key, Action action)
         {
             return new CardAction(
-                            title: command,
-                            value: $"{command} {key}",
+                            title: action.Caption,
+                            value: $"{action.Command} {key}",
                             type: "imBack");
         }
 

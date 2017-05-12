@@ -8,9 +8,9 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class MarkAsSeenResponder : TorrentMarkResponder
     {
-        protected override string CommandText => MessagesConsts.MarkAsSeenAction;
+        protected override string CommandText => Actions.TorrrentSeen.Command;
 
-        protected override ITableEntity UpdateTorrent(TorrentEntity torrentEntity)
+        protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
 
@@ -23,9 +23,9 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
     public class MarkAsDownloadedResponder : TorrentMarkResponder
     {
-        protected override string CommandText => MessagesConsts.MarkAsDownloadedAction;
+        protected override string CommandText => Actions.TorrrentDownloaded.Command;
 
-        protected override ITableEntity UpdateTorrent(TorrentEntity torrentEntity)
+        protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
 
@@ -38,9 +38,9 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
     public class ClearTorrentStateResponder : TorrentMarkResponder
     {
-        protected override string CommandText => MessagesConsts.ClearState;
+        protected override string CommandText => Actions.TorrentResetState.Command;
 
-        protected override ITableEntity UpdateTorrent(TorrentEntity torrentEntity)
+        protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
 
@@ -74,11 +74,11 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
             var torrentRepository = new TorrentRepository();
 
-            await torrentRepository.SaveTorrentAsync(toUpdate);
+            await torrentRepository.SaveAsync(toUpdate);
             reply.Text = $"{CommandText} - Success!";
             await client.Conversations.ReplyToActivityAsync(reply);
         }
 
-        protected abstract ITableEntity UpdateTorrent(TorrentEntity torrentEntity);
+        protected abstract DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity);
     }
 }

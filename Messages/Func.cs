@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure;
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
@@ -15,21 +14,6 @@ namespace PersonalBot.Functions.Messages
 
     public class Func
     {
-        public static string[] TopicIds
-        {
-            get
-            {
-                var topicIdsString = CloudConfigurationManager.GetSetting("TopicIds");
-
-                if (topicIdsString == null)
-                {
-                    throw new ApplicationException("TopicIds setting must be provided");
-                }
-
-                return topicIdsString.Split(',');
-            }
-        }
-
         public static async Task<object> Run(HttpRequestMessage req)
         {
             // Initialize the azure bot
@@ -77,6 +61,9 @@ namespace PersonalBot.Functions.Messages
                 var reply = request.CreateReply();
                 switch (request.Text)
                 {
+                    case string txt when TorrentSubscribeResponder.Match(txt):
+                        await TorrentSubscribeResponder.ProcessAsync(client, request, reply);
+                        break;
                     case string txt when new MarkAsSeenResponder().Match(txt):
                         await new MarkAsSeenResponder().ProcessAsync(client, reply, txt);
                         break;
@@ -87,7 +74,7 @@ namespace PersonalBot.Functions.Messages
                         await new ClearTorrentStateResponder().ProcessAsync(client, reply, txt);
                         break;
                     default:
-                        await TorrentListResponder.ProcessAsync(client, reply, TopicIds);
+                        await TorrentListResponder.ProcessAsync(client, reply);
                         break;
                 }
             }
