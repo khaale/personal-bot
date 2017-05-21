@@ -96,6 +96,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
                     (t.IsDownloaded ? "\u25bc " : "")
                     + (t.IsSeen ? "\u2714 " : "")
                     + t.Updated,
+                Text = t.Series
             };
 
             card.Buttons = new List<CardAction>
