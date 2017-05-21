@@ -5,9 +5,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Azure;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
-using PersonalBot.Shared.Domain.Torrents.Responders;
+using PersonalBot.Functions.Messages.Dialogs;
 
 namespace PersonalBot.Functions.Messages
 {
@@ -36,8 +37,8 @@ namespace PersonalBot.Functions.Messages
                     // one of these will have an interface and process it
                     switch (activity.GetActivityType())
                     {
-                        case ActivityTypes.Message:                            
-                            await ReplyOnMessageAsync(client, activity);
+                        case ActivityTypes.Message:
+                            await Conversation.SendAsync(activity, () => new RootDialog());
                             break;
                         case ActivityTypes.ConversationUpdate:
                             await ReplyOnConversationUpdateAsync(client, activity);
@@ -54,39 +55,6 @@ namespace PersonalBot.Functions.Messages
             }
         }
 
-        private static async Task ReplyOnMessageAsync(ConnectorClient client, Activity request)
-        {
-            try
-            {
-                var reply = request.CreateReply();
-                switch (request.Text)
-                {
-                    case string txt when TorrentSubscribeResponder.Match(txt):
-                        await TorrentSubscribeResponder.ProcessAsync(client, request, reply);
-                        break;
-                    case string txt when new MarkAsSeenResponder().Match(txt):
-                        await new MarkAsSeenResponder().ProcessAsync(client, reply, txt);
-                        break;
-                    case string txt when new MarkAsDownloadedResponder().Match(txt):
-                        await new MarkAsDownloadedResponder().ProcessAsync(client, reply, txt);
-                        break;
-                    case string txt when new ClearTorrentStateResponder().Match(txt):
-                        await new ClearTorrentStateResponder().ProcessAsync(client, reply, txt);
-                        break;
-                    default:
-                        await TorrentListResponder.ProcessAsync(client, reply);
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                var reply = request.CreateReply();
-                reply.Text = ex.ToString();
-                reply.TextFormat = "plain";
-                await client.Conversations.ReplyToActivityAsync(reply);
-            }
-        }
-        
         public static async Task ReplyOnConversationUpdateAsync(ConnectorClient client, Activity activity)
         {
             IConversationUpdateActivity update = activity;

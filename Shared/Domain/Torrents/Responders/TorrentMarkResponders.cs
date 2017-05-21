@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using Microsoft.WindowsAzure.Storage.Table;
+using PersonalBot.Shared.Core.Responders;
 using PersonalBot.Shared.Domain.Torrents.Models;
 using PersonalBot.Shared.Domain.Torrents.Services;
 
@@ -8,8 +9,6 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class MarkAsSeenResponder : TorrentMarkResponder
     {
-        protected override string CommandText => Actions.TorrrentSeen.Command;
-
         protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
@@ -19,12 +18,14 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
             return entity;
         }
+
+        public MarkAsSeenResponder(IMessageSender sender) : base(sender)
+        {
+        }
     }
 
     public class MarkAsDownloadedResponder : TorrentMarkResponder
     {
-        protected override string CommandText => Actions.TorrrentDownloaded.Command;
-
         protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
@@ -34,12 +35,14 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
             return entity;
         }
+
+        public MarkAsDownloadedResponder(IMessageSender sender) : base(sender)
+        {
+        }
     }
 
     public class ClearTorrentStateResponder : TorrentMarkResponder
     {
-        protected override string CommandText => Actions.TorrentResetState.Command;
-
         protected override DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity)
         {
             var entity = new DynamicTableEntity(torrentEntity.PartitionKey, torrentEntity.RowKey);
@@ -50,24 +53,23 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 
             return entity;
         }
+
+        public ClearTorrentStateResponder(IMessageSender sender) : base(sender)
+        {
+        }
     }
 
     public abstract class TorrentMarkResponder
     {
-        protected abstract string CommandText
+        private readonly IMessageSender _sender;
+
+        protected TorrentMarkResponder(IMessageSender sender)
         {
-            get;
+            _sender = sender;
         }
 
-        public bool Match(string text)
+        public async Task ProcessAsync(IMessageActivity reply, TorrentKey key)
         {
-            return text != null && text.StartsWith(CommandText);
-        }
-
-        public async Task ProcessAsync(ConnectorClient client, Activity reply, string message)
-        {
-            var keyString = message.Remove(0, CommandText.Length).Trim();
-            var key = new TorrentKey(keyString);
             var entity = new TorrentEntity(key.TopicId, key.InfoHash);
 
             var toUpdate = UpdateTorrent(entity);
@@ -75,8 +77,8 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             var torrentRepository = new TorrentRepository();
 
             await torrentRepository.SaveAsync(toUpdate);
-            reply.Text = $"{CommandText} - Success!";
-            await client.Conversations.ReplyToActivityAsync(reply);
+            reply.Text = "Success!";
+            await _sender.SendAsync(reply);
         }
 
         protected abstract DynamicTableEntity UpdateTorrent(TorrentEntity torrentEntity);

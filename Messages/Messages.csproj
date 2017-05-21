@@ -121,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Dialogs\RootDialog.cs" />
+    <Compile Include="Dialogs\TorrentDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Func.cs" />

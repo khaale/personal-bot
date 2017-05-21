@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using PersonalBot.Shared.Core.Responders;
 using PersonalBot.Shared.Domain.Conversations.Models;
 using PersonalBot.Shared.Domain.Conversations.Services;
 using PersonalBot.Shared.Domain.Torrents.Responders;
@@ -48,8 +49,9 @@ namespace PersonalBot.Functions.CheckTorrents
             var activity = reference.GetPostToUserMessage();
 
             var client = new ConnectorClient(new Uri(activity.ServiceUrl));
-            
-            await TorrentListResponder.ProcessAsync(client, activity, true);
+            var sender = new ProactiveMessageSender(client);
+
+            await new TorrentListResponder(sender).ProcessAsync(activity, true);
         }
 
         private static async Task<IReadOnlyCollection<ConversationEntity>> GetConversations(string channel)

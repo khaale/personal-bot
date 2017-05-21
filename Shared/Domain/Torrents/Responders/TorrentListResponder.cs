@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure;
 using Microsoft.Bot.Connector;
+using PersonalBot.Shared.Core.Responders;
 using PersonalBot.Shared.Domain.Torrents.Models;
 using PersonalBot.Shared.Domain.Torrents.Services;
 
@@ -11,6 +12,8 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class TorrentListResponder
     {
+        private readonly IMessageSender _sender;
+
         public static string[] TopicIds
         {
             get
@@ -26,7 +29,12 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             }
         }
 
-        public static async Task ProcessAsync(ConnectorClient client, Activity reply, bool sendWhenNew = false)
+        public TorrentListResponder(IMessageSender sender)
+        {
+            _sender = sender;
+        }
+
+        public async Task ProcessAsync(IMessageActivity reply, bool sendWhenNew = false)
         {
             var repository = new TorrentRepository();
             reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -49,14 +57,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
                 // Fill and send reply message
                 FillReply(reply, data);
 
-                if (reply.ReplyToId != null)
-                {
-                    await client.Conversations.ReplyToActivityAsync(reply);
-                }
-                else
-                {
-                    await client.Conversations.SendToConversationAsync(reply);
-                }
+                await _sender.SendAsync(reply);
             }
 
             // Save new torrents to the storage
@@ -73,7 +74,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
                 select (topic, entity);
         }
 
-        private static void FillReply(Activity reply, IReadOnlyCollection<(Topic, TorrentEntity)> topics)
+        private static void FillReply(IMessageActivity reply, IReadOnlyCollection<(Topic, TorrentEntity)> topics)
         {
             topics
                 .OrderBy(x => x.Item2?.IsSeen)
@@ -87,7 +88,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
                 });
         }
 
-        private static void FillReply(Activity reply, TorrentPresenter t)
+        private static void FillReply(IMessageActivity reply, TorrentPresenter t)
         {
             var card = new HeroCard
             {
@@ -115,7 +116,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             else if (t.IsDownloaded)
             {
                 card.Buttons.Add(
-                    CreateTorrentStateChangeButton(t.Key, Actions.TorrrentSeen));
+                    CreateTorrentStateChangeButton(t.Key, Actions.TorrentSeen));
             }
             else
             {
@@ -128,11 +129,11 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             reply.Attachments.Add(card.ToAttachment());
         }
 
-        private static CardAction CreateTorrentStateChangeButton(TorrentKey key, Action action)
+        private static CardAction CreateTorrentStateChangeButton(TorrentKey key, TorrentAction action)
         {
             return new CardAction(
                             title: action.Caption,
-                            value: $"{action.Command} {key}",
+                            value: action.ToMessage(key),
                             type: "imBack");
         }
 

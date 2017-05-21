@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.ConnectorEx;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using PersonalBot.Shared.Core.Responders;
 using PersonalBot.Shared.Domain.Conversations.Models;
 using PersonalBot.Shared.Domain.Conversations.Services;
 
@@ -9,12 +10,14 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
 {
     public class TorrentSubscribeResponder
     {
-        public static bool Match(string text)
+        private readonly IMessageSender _sender;
+
+        public TorrentSubscribeResponder(IMessageSender sender)
         {
-            return !string.IsNullOrWhiteSpace(text) && text.StartsWith(Actions.TorrentSubscribe.Command);
+            _sender = sender;
         }
 
-        public static async Task ProcessAsync(ConnectorClient client, Activity request, Activity reply)
+        public async Task ProcessAsync(IMessageActivity request, IMessageActivity reply)
         {
             var entity = new ConversationEntity(request.ChannelId, request.Recipient.Id);
             entity.IsActive = true;
@@ -27,7 +30,7 @@ namespace PersonalBot.Shared.Domain.Torrents.Responders
             await repo.SaveAsync(entity);
 
             reply.Text = "You have been subscribed to new torrent announcements";
-            await client.Conversations.SendToConversationAsync(reply);
+            await _sender.SendAsync(reply);
         }
     }
 }
