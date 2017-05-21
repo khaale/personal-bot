@@ -21,16 +21,20 @@ namespace PersonalBot.Functions.Messages.Dialogs
 
             if (message.Text.StartsWith(Actions.TorrentsPrefix))
             {
-                await context.Forward(new TorrentDialog(), ResumeAfterTorrentDialog, message, CancellationToken.None);
+                await context.Forward(new TorrentDialog(), ResumeAfterDialog, message, CancellationToken.None);
+            }
+            else if (message.Text.StartsWith(Actions.Help.FullCommand))
+            {
+                await context.Forward(new HelpDialog(), ResumeAfterDialog, message, CancellationToken.None);
             }
             else
             {
-                await context.PostAsync("Available commands: `!t`");
+                await context.PostAsync($"Sorry, don't understand you. Try `{Actions.Help.FullCommand}` to list available commands.");
                 context.Wait(MessageReceivedAsync);
             }
         }
 
-        private async Task ResumeAfterTorrentDialog(IDialogContext context, IAwaitable<bool> result)
+        private async Task ResumeAfterDialog(IDialogContext context, IAwaitable<bool> result)
         {
             try
             {
