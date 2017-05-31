@@ -22,8 +22,10 @@ type WeatherResponder(sender:IMessageSender) =
             let desc = selector.SelectNodeText (CssSelector ".weather-today__explanation")
             let detailsUri = selector.SelectNodeAttribute (AttrName "href") (CssSelector ".weather-today__meta a")
 
-            let getDefaulValue = 
-                Option.defaultValue "Unknown"
+            let getDefaulValue opt = 
+                match opt with 
+                | Some x -> x
+                | None -> "Unknown"
 
             return { 
                 Explanation = getDefaulValue desc; 

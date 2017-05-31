@@ -5,7 +5,7 @@
     {
       "type": "timerTrigger",
       "name": "timerInfo",
-      "schedule": "0 * * * * *",
+      "schedule": "0 45 5 * * *",
       "direction": "in"
     },
     {
