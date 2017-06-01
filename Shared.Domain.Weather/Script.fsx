@@ -45,30 +45,3 @@ let selectNode (CssSelector selector) (html:HtmlDocument) =
 
 let selectNodeText selector html = 
     selectNode selector html |> Option.map (fun x -> (x.InnerText ()).Trim ())
-
-   (*
-let selectNodeText = 
-    selectNode >> Option.map (fun x -> (x.InnerText ()).Trim ())
-let selectNodeAttribute html (AttrName attrName) = 
-    selectNode >> Option.map(fun x -> (x.AttributeValue attrName).Trim ())
-    *)
-let pageCtx = PageBuilder (site.Html)
-let result = pageCtx {
-    let! x = selectNode (CssSelector "span.weather-now__value")
-    return x
-}
-
-result site.Html
-
-
-let x = null
-not (isNull x) 
-x <> null
-
-
-
-let notNull x = x |> isNull |> not
-notNull x
-
-let nn = isNull |> not
-not <| isNull x

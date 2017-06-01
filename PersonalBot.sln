@@ -22,6 +22,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Shared.Domain.Weather", "Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckWeather", "CheckWeather\CheckWeather.csproj", "{038B7640-1ED7-481D-B191-B18E839BD5CE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5288769C-5ECC-4258-B194-17F8CD1011DF}"
+	ProjectSection(SolutionItems) = preProject
+		publish.ps1 = publish.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

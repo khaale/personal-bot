@@ -1,5 +1,5 @@
 ﻿{
-  "scriptFile": "bin\\Debug\\PersonalBot.Functions.CheckWeather.dll",
+  "scriptFile": "..\\bin\\PersonalBot.Functions.CheckWeather.dll",
   "entryPoint": "PersonalBot.Functions.CheckWeather.Func.Run",
   "bindings": [
     {
