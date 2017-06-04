@@ -120,6 +120,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\WeatherDialog.cs" />
     <Compile Include="Dialogs\HelpDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
@@ -137,6 +138,10 @@
     <None Include="function.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Shared.Domain.Weather\Shared.Domain.Weather.fsproj">
+      <Project>{537e005b-ffdc-468c-b0df-93ab9d3f1b07}</Project>
+      <Name>Shared.Domain.Weather</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shared\Shared.csproj">
       <Project>{2BFC0909-B7A1-4A66-A8A1-915B3678C0A5}</Project>
       <Name>Shared</Name>

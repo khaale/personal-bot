@@ -1,47 +1,23 @@
 ﻿// Learn more about F# at http://fsharp.org. See the 'F# Tutorial' project
 // for more guidance on F# programming.
 
-#r "../packages/FSharp.Data.2.3.3/lib/net40/FSharp.Data.dll"
+#r "../packages/FSharp.Data.2.3.1/lib/net40/FSharp.Data.dll"
+#load "Utils.fs"
+
 open FSharp.Data
+open PersonalBot.Shared.Domain.Weather.Utils
 
 let ramblerWeatherUri = "https://weather.rambler.ru/v-samare/"
 
 type RamblerWeather = HtmlProvider<"./data/weather.rambler.ru.html">
 
-type CssSelector = CssSelector of string
-type AttrName = AttrName of string
+type YandexWeather = HtmlProvider<"https://yandex.ru/pogoda/samara/details">
 
-let site = RamblerWeather.Load ramblerWeatherUri
-(*
-let selectNode (CssSelector selector) =
-     match (site.Html.CssSelect selector) with 
-        | x when not x.IsEmpty -> Some x.Head
-        | _ -> None
+let yw = YandexWeather.Load "https://yandex.ru/pogoda/samara/details"
 
-let selectNodeText = selectNode >> Option.map (fun x -> (x.InnerText ()).Trim ())
+let selector = new HtmlSelector(yw.Html)
 
-let selectNodeAttribute (AttrName attrName) = selectNode >> Option.map(fun x -> (x.AttributeValue attrName).Trim ())
-
-let temp = selectNodeText (CssSelector "span.weather-now__value")
-let desc = selectNodeText (CssSelector ".weather-today__explanation")
-let detailsUri = selectNodeAttribute (AttrName "href") (CssSelector ".weather-today__meta a")
-
-
-let getRamblerWeatherPage =
-        RamblerWeather.AsyncLoad ramblerWeatherUri
-
-let ramblerWeatherPage = getRamblerWeatherPage |> Async.RunSynchronously
-*)
-
-type PageBuilder(html:HtmlDocument) =
-    member this.Return x = x
-    member this.Bind(x,f) = f x 
-
-
-let selectNode (CssSelector selector) (html:HtmlDocument) = 
-        match (html.CssSelect selector) with 
-        | x when not x.IsEmpty -> Some x.Head
-        | _ -> None
-
-let selectNodeText selector html = 
-    selectNode selector html |> Option.map (fun x -> (x.InnerText ()).Trim ())
+let degrees = selector.SelectNodeText (CssSelector ".current-weather__thermometer_type_now")
+let explanation = selector.SelectNodeText (CssSelector ".current-weather__comment")
+let explanationRain = 
+    selector.SelectNodeText (CssSelectors [".nowcast-switcher__title_long > span"; ".nowcast-switcher__title_long"])

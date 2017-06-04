@@ -17,6 +17,9 @@ namespace PersonalBot.Shared.Domain
     {
         public static readonly SimpleAction Help = new SimpleAction("!help", "", "Help", "See all available commands");
 
+        public static readonly string WeatherPrefix = "!w";
+        public static readonly SimpleAction Weather = new SimpleAction(WeatherPrefix, "", "Weather", "Shows weather");
+
         public static readonly string TorrentsPrefix = "!t";
         public static readonly SimpleAction TorrentList = new SimpleAction(TorrentsPrefix, "", "List", "See torrents list");
         public static readonly TorrentAction TorrentSeen = new TorrentAction(TorrentsPrefix, "seen", "Mark as seen", "Marks torrent as seen");

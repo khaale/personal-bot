@@ -6,6 +6,7 @@ open PersonalBot.Shared.Domain.Weather.Utils
 type RamblerWeatherProvider = HtmlProvider<"./data/weather.rambler.ru.html">
 type TodayWeatherSummary = { Explanation: string; Temperature: string; DetailsUri: string }
 
+let ramblerWeatherHostUri = "https://weather.rambler.ru"
 let ramblerWeatherUri = "https://weather.rambler.ru/v-samare/"
 
 let getTodaySummaryAsync = 
@@ -18,13 +19,11 @@ let getTodaySummaryAsync =
         let desc = selector.SelectNodeText (CssSelector ".weather-today__explanation")
         let detailsUri = selector.SelectNodeAttribute (AttrName "href") (CssSelector ".weather-today__meta a")
 
-        let getDefaulValue = function
-            | Some x -> x
-            | None -> "Unknown"
+        let getDefaulValue opt = defaultArg opt "Unknown"
 
         return { 
             Explanation = getDefaulValue desc; 
             Temperature = getDefaulValue temp; 
-            DetailsUri = getDefaulValue detailsUri 
+            DetailsUri = ramblerWeatherHostUri + getDefaulValue detailsUri
         }
     }

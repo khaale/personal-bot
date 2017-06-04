@@ -23,6 +23,10 @@ namespace PersonalBot.Functions.Messages.Dialogs
             {
                 await context.Forward(new TorrentDialog(), ResumeAfterDialog, message, CancellationToken.None);
             }
+            else if (message.Text.StartsWith(Actions.WeatherPrefix))
+            {
+                await context.Forward(new WeatherDialog(), ResumeAfterDialog, message, CancellationToken.None);
+            }
             else if (message.Text.StartsWith(Actions.Help.FullCommand))
             {
                 await context.Forward(new HelpDialog(), ResumeAfterDialog, message, CancellationToken.None);
