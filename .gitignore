@@ -112,3 +112,5 @@ UpgradeLog*.XML
 App_Data/*.mdf
 App_Data/*.ldf
 /.vs/config
+/.vscode/
+/.staging/
