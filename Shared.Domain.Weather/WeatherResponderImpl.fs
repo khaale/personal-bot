@@ -11,37 +11,37 @@ module private Messages =
         card.Buttons <- new List<CardAction>()
         card
 
-    let addUrlButton (card:HeroCard) title value = 
+    let addUrlButton title value (card:HeroCard) = 
         let button = new CardAction()
         button.Title <- title
         button.Type <- "openUrl"
         button.Value <- value  
         card.Buttons.Add ( button )
+        card
 
     let fillReply (reply:IMessageActivity) (cards:seq<Attachment>) =
         printfn "reply: %A" reply
         reply.AttachmentLayout <- AttachmentLayoutTypes.Carousel
         if reply.Attachments = null then reply.Attachments <- new List<Attachment>()
         cards |> Seq.iter (fun a -> reply.Attachments.Add a)
+        reply
     
     let createRamblerCard (summary: RamblerWeather.TodayWeatherSummary) = 
-        let card = createCard (sprintf "Rambler: %s°C" summary.Temperature) (summary.Explanation)
-        addUrlButton card "Details" summary.DetailsUri
-        card
+        createCard (sprintf "Rambler: %s°C" summary.Temperature) (summary.Explanation) 
+            |> addUrlButton "Details" summary.DetailsUri
 
     let createYandexCard (summary: YandexWeather.TodayWeatherSummary) = 
-        let card = createCard (sprintf "Yandex: %s" summary.Temperature) (sprintf "%s, %s." summary.ExplanationRain summary.Explanation)
-        addUrlButton card "Details" summary.DetailsUri
-        addUrlButton card "Rain Map" summary.RainMapUri
-        card
+        createCard (sprintf "Yandex: %s" summary.Temperature) (sprintf "%s, %s." summary.ExplanationRain summary.Explanation)
+            |> addUrlButton "Details" summary.DetailsUri
+            |> addUrlButton "Rain Map" summary.RainMapUri
  
 module Env = 
     type IEnvironment =                                              
-        abstract member GetRamblerWeather : unit -> Async<RamblerWeather.TodayWeatherSummary>
-        abstract member GetYandexWeather : unit -> Async<YandexWeather.TodayWeatherSummary>
-        abstract member SendReply : IMessageActivity -> Async<unit>
+        abstract member GetRamblerWeatherAsync : unit -> Async<RamblerWeather.TodayWeatherSummary>
+        abstract member GetYandexWeatherAsync : unit -> Async<YandexWeather.TodayWeatherSummary>
+        abstract member SendReplyAsync : IMessageActivity -> Async<unit>
 
-    type EAsync<'a> = IEnvironment -> Async<(IEnvironment*'a)>
+    type private EAsync<'a> = IEnvironment -> Async<(IEnvironment*'a)>
 
     type EnvBuilderAsync() = 
         let abind fn v = async.Bind (v,fn)
@@ -50,15 +50,15 @@ module Env =
             (x' |> abind << computation) env
         member x.Return v e = async.Return (e,v)
 
-    let wrapAsync f e = 
+    let private wrapEnv f (e:IEnvironment) = 
         async {  
             let! r = f e
             return (e,r)
         }
 
-    let getRamblerWeatherAsync () (env:IEnvironment) = wrapAsync (fun (e:IEnvironment) -> e.GetRamblerWeather ()) env
-    let getYandexWeatherAsync () (env:IEnvironment) = wrapAsync (fun (e:IEnvironment) -> e.GetYandexWeather ()) env
-    let sendReplyAsync reply (env:IEnvironment) = wrapAsync (fun (e:IEnvironment) -> e.SendReply reply) env 
+    let getRamblerWeatherAsync () = wrapEnv <| fun e -> e.GetRamblerWeatherAsync ()
+    let getYandexWeatherAsync () = wrapEnv <| fun e -> e.GetYandexWeatherAsync ()
+    let sendReplyAsync reply = wrapEnv <| fun e -> e.SendReplyAsync reply 
 
     let envAsync = EnvBuilderAsync()
 
@@ -69,11 +69,11 @@ let sendWeather reply =
 
         let rcard = Messages.createRamblerCard rw
         let ycard = Messages.createYandexCard yw
-        [rcard; ycard] 
+        
+        do! [rcard; ycard] 
             |> Seq.map (fun x -> x.ToAttachment()) 
             |> Messages.fillReply reply
-
-        do! Env.sendReplyAsync reply
+            |> Env.sendReplyAsync
 
         return true
     }

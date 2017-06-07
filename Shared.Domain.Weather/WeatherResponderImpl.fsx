@@ -23,9 +23,9 @@ let prettyPrint x =
 let msg = (new Activity()) :> IMessageActivity
 let fakeEnv = {
     new Env.IEnvironment with
-        member this.GetRamblerWeather () = RamblerWeather.getTodaySummaryAsync
-        member this.GetYandexWeather () = YandexWeather.getTodaySummaryAsync
-        member this.SendReply x = async { printfn "%s" <| prettyPrint x }
+        member this.GetRamblerWeatherAsync () = RamblerWeather.getTodaySummaryAsync
+        member this.GetYandexWeatherAsync () = YandexWeather.getTodaySummaryAsync
+        member this.SendReplyAsync x = async { printfn "%s" <| prettyPrint x }
     }
 
 sendWeather msg fakeEnv |> Async.RunSynchronously |> ignore
